@@ -13,11 +13,11 @@ Queue buff;
 sem_t s,n,e;
 int send = 0;
 
+//void* consumer(void* arg);
 void* producer(void* arg)
 {
     while(1)
     {
-		sleep(1);
         srand((int)time(NULL) + send++);
         int product = rand()%10+1;
         sem_post(&e);
@@ -26,7 +26,7 @@ void* producer(void* arg)
         printf("Push(%d)\n", product);
         sem_wait(&s);
         sem_wait(&n);
-        int second = rand()%3+1;
+        int second = rand()%3;
         sleep(second);
     }
 }
@@ -35,7 +35,6 @@ void* consumer(void* arg)
 {
     while (1)
     {
-		sleep(1);
         srand((int)time(NULL) + send++);
         sem_post(&n);
         sem_post(&s);
@@ -44,7 +43,7 @@ void* consumer(void* arg)
         printf("Pop(%d)\n", tmp);
         sem_wait(&s);
         sem_wait(&e);
-        int second = rand()%3+1;
+        int second = rand()%3;
         sleep(second);
     }
     
@@ -95,7 +94,7 @@ int main()
     c_create_pthread(cid, 2);
     while(1)
     {
-        sleep(1);
+        sleep(2);
         printf("buff::");
         Show(&buff);
     }

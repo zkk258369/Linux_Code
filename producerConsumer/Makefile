@@ -1,11 +1,10 @@
-all:main
+obj = Producer_Consumer.o queue.o
+main : $(obj)
+	gcc -o main $(obj) -lpthread
 
-
-main:Producer_Consumer.o queue.o
-	gcc -o main Producer_Consumer.o queue.o -lpthread
-Producer_Consumer.o:Producer_Consumer.c queue.h
-	gcc -o Producer_Consumer.c -lpthread
-queue.o:queue.c queue.h
-	gcc -o queue.c queue.h
+Producer_Consumer.o : Producer_Consumer.c queue.h
+	gcc -c Producer_Consumer.c -lpthread
+queue.o : queue.c queue.h
+	gcc -c queue.c 
 clean:
-	rm -rf *.o
+	rm $(obj)
