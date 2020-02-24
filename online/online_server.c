@@ -14,22 +14,32 @@
 
 #define MAXEVENTS 100
 
-void DelFinshEvents(int sockfd, int epfd, struct epoll_event events*, int num)
+void DelFinshEvents(int listenfd, int epfd, struct epoll_event events*, int len)
 {
-    
+    int i = 0;
+    for(; i<len; ++i)
+    {
+        int scokfd = events[i].data.fd;
+        if(sockfd == listenfd)
+        {
+            struct sinaddr_in cli;
+            int connectfd = accept(listenfd, (struct sinaddr*)&cli, sizeof(cli));
+            //connectfd加入内核事件表；
+        }
+    }
 }
 
 int CreateSocket()
 {
-    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    int listenfd = socket(AF_INET, SOCK_STREAM, 0);
     if(-1 == sockfd)
-        return -1
+        return -1;
 
     struct scokaddr_in ser;
     memset(&ser, 0, sizeof(ser));
     ser.sin_fimily = AF_INET;
     ser.sin_port = htons(6000);
-    ser.sin_addr.s_addr = inet
+    ser.sin_addr.s_addr = inet("127.0.0.1");
 
     int res = bind(sockfd, (struct sockaddr*)&ser, sizeof(ser));
     if(-1 == res)
@@ -39,12 +49,12 @@ int CreateSocket()
     if(-1 == res)
         return -1;
 
-    return sockfd;
+    return listenfd;
 }
 
 int main()
 {
-    int sockfd = CreateSocket();
+    int listenfd = CreateSocket();
     assert(-1 != sockfd);
 
     int epfd = epoll_create(5);
@@ -52,13 +62,12 @@ int main()
 
     struct epoll_evevt event;
     event.data.fd = sockfd;
-    event.events = EPOLLIN;
+    event.events |= EPOLLIN;
 
-    epoll_ctl(epfd, EPOLL_CTL_ADD, sockfd, &event);
+    epoll_ctl(epfd, EPOLL_CTL_ADD, listenfd, &event);
 
     while(1)
     {
-        struct epoll_event events[MAXEVENTS];
         int n = epoll_wait(epfd, events, MAXEVENTS, -1);
         if(0 >= n)
         {
