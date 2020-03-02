@@ -66,6 +66,9 @@ void WriteCode(int flag, int language)
 
 void SendData(int sockfd, int language)
 {
+    //1.先发送协议头  language + file_size
+    //2.发送代码文件内容
+
     struct stat st;
     stat(file[language-1], &st);
 
@@ -91,12 +94,40 @@ void SendData(int sockfd, int language)
 
 void RecvData(int sockfd)
 {
+    int size = 0;
+    recv(sockfd, &size, 4, 0);
 
+    int num = 0;
+
+    while(1)
+    {
+        int x = size-num > 127 ? 127 : size-num;
+        char buff[128] = {0};
+        int n = recv(sockfd, buff, x, 0);
+        if(n <= 0)
+        {
+            close(sockfd);
+            exit(0);
+        }
+        printf("%s", buff);
+        num+=n;
+        if(num >= size)
+            break;
+    }
 }
 
 int PrintTag()
 {
+    printf("************************\n");
+    printf("** 1 修改代码 **\n");
+    printf("** 2 下一个   **\n");
+    printf("** 3  退出    **\n");
+    printf("************************\n");
+    printf("Please input number: ");
+    int flag = 0;
+    scanf("%d", &flag);
 
+    return flag;
 }
 
 int main()
@@ -121,7 +152,12 @@ int main()
         SendData(scokfd, language);
 
         //3.
+        RecvData(sockfd);
 
+        //4.
+        flag = PrintTag();
+        if(3 == flag)
+            break;
     }
 
     close(sockfd);

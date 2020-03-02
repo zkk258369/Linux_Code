@@ -110,12 +110,58 @@ int ComplieCode(int language)
 
 void Execute(int language)
 {
+    pid_t pid = fork();
+    assert(pid != -1);
 
+    if(0 == pid)
+    {
+        int fd = open("./result.txt", O_WRONLY | O_TRUNC | O_CREAT, 0664);
+        close(1);
+        close(2);
+        dup(fd);
+        dup(fd);
+        if(language == 3)
+        {
+            execl(carr[language-1] ,carr[language-1], "main.class", (char*)0);
+
+        }
+        else
+        {
+            execl(carr[language-1] ,carr[language-1], (char*)0);
+        }
+
+        write(fd, "execute error", 13);
+        exit(0);
+    }
+    else
+    {
+        wait(0);
+    }
 }
 
 void SendResult(int connectfd, int flag)
 {
+    char* file = "./result.txt";
+    if(flag) //如果 flag!=0 则表示编译出错
+    {
+        file = "./build_error.txt";
+    }
 
+    struct stat st;
+    stat(file, &st);
+
+    send(connectfd, (int*)&st.st_size, 4, 0);
+
+    int filefd = open(file, O_RDONLY);
+    while(1)
+    {
+        char buff[128] = {0};
+        int n = read(filefd, buff, 127);
+        if(n <= 0)
+            break;
+        send(connectfd, buff, n, 0);
+    }
+    close(filefd);
 }
 
 void DealClientData(int connectfd)
@@ -136,11 +182,11 @@ void DealClientData(int connectfd)
     if(0 == flag)
     {
         Execute(language);
-        SendResult(fd, flag);
+        SendResult(connectfd, flag);
     }
     else
     {
-        SendResult(fd, flag);
+        SendResult(connectfd, flag);
     }
 }
 
