@@ -10,7 +10,7 @@
 #include<netinet/in.h>
 #include<sys/epoll.h>
 #include<fcntl.h>
-#include<sys.stat.h>
+#include<sys/stat.h>
 #include"head.h"
 
 #define MAXEVENTS 100
@@ -18,7 +18,7 @@
 int RecvCode(int connectfd)
 {
     struct Head head;
-    recv(fd, &head,sizeof(head), 0);
+    recv(connectfd, &head,sizeof(head), 0);
     int filefd = open(file[head.language-1], O_WRONLY | O_TRUNC | O_CREAT, 0664);
 
     int size = 0;
@@ -40,7 +40,7 @@ int RecvCode(int connectfd)
     return head.language;
 }
 
-void GetNewClient(int connectfd, int epfd)
+void GetNewClient(int listenfd, int epfd)
 {
     struct sockaddr_in cli;
     socklen_t = sizeof(cli);
@@ -190,7 +190,7 @@ void DealClientData(int connectfd)
     }
 }
 
-void DelFinshEvents(int listenfd, int epfd, struct epoll_event events*, int len)
+void DelFinshEvents(int listenfd, int epfd, struct epoll_event* events, int len)
 {
     int i = 0;
     for(; i<len; ++i)
@@ -223,7 +223,7 @@ void DelFinshEvents(int listenfd, int epfd, struct epoll_event events*, int len)
 int CreateSocket()
 {
     int listenfd = socket(AF_INET, SOCK_STREAM, 0);
-    if(-1 == sockfd)
+    if(-1 == listenfd)
         return -1;
 
     struct scokaddr_in ser;
@@ -234,7 +234,7 @@ int CreateSocket()
 
     int res = bind(sockfd, (struct sockaddr*)&ser, sizeof(ser));
     if(-1 == res)
-        retutn -1;
+        return -1;
 
     res = listen(sockfd, 5);
     if(-1 == res)
@@ -246,7 +246,7 @@ int CreateSocket()
 int main()
 {
     int listenfd = CreateSocket();
-    assert(-1 != sockfd);
+    assert(-1 != listenfd);
 
     int epfd = epoll_create(5);
     assert(-1 != epfd);
@@ -259,6 +259,7 @@ int main()
 
     while(1)
     {
+        struct epoll_event events[MAXEVENTS];
         int n = epoll_wait(epfd, events, MAXEVENTS, -1);
         if(0 >= n)
         {
