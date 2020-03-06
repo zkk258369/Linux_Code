@@ -2,6 +2,8 @@
 #include<assert.h>
 #include<unistd.h>
 #include<stdlib.h>
+#include<sys/types.h>
+#include<errno.h>
 #include<arpa/inet.h>
 #include<netinet/in.h>
 #include<sys/socket.h>
@@ -19,7 +21,16 @@ int main()
 	saddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 	int res = connect(sockfd,(struct sockaddr *)&saddr,sizeof(saddr));
-	assert(res != -1);
+	//assert(res != -1);
+    if(res == ECONNREFUSED)
+    {
+        printf("connrefused\n");
+    }
+    if(res == ETIMEDOUT)
+    {
+        printf("timeout\n");
+    }
+    assert(res != -1);
 
 	while(1)
 	{
@@ -34,16 +45,13 @@ int main()
 
 		send(sockfd, buff,strlen(buff),0);
 
-		memset(buff,0,128);
-		recv(sockfd,buff,127,0);
-		printf("buff=%s\n",buff);
+		//memset(buff,0,128);
+		//recv(sockfd,buff,127,0);
+		//printf("buff=%s\n",buff);
 
 	}
 	close(sockfd);
 	exit(0);
 }
-
-
-
 
 

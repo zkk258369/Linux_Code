@@ -13,7 +13,7 @@
 
 int StartLink(void)
 {
-    int sockfd = sockfd(AF_INET, SOCK_STREAM, 0);
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if(-1 == sockfd)
         return -1;
 
@@ -32,6 +32,10 @@ int StartLink(void)
 
 int ChoiceLanguage(void)
 {
+    system("clear");
+    printf("******************************\n");
+    printf("**** choose a language *******\n");
+    printf("******************************\n");
     printf("******************************\n");
     printf("****  1      C语言   *****\n");
     printf("****  2      C++     *****\n");
@@ -54,7 +58,9 @@ void WriteCode(int flag, int language)
     if(0 == pid)
     {
         //替换成vim
-        execl("/usr/bin/vim", "/usr/bin/vim", file[language-1]);
+        char filename[50] = {0};
+        sprintf(filename, "%.10s%.20s", clidir, file[language-1]);
+        execl("/usr/bin/vim", "/usr/bin/vim", filename);
         printf("exec vim error\n");
         exit(0);
     }
@@ -69,8 +75,11 @@ void SendData(int sockfd, int language)
     //1.先发送协议头  language + file_size
     //2.发送代码文件内容
 
+    char filename[50] = {0};
+    sprintf(filename, "%.10s%.20s", clidir, file[language-1]);
+
     struct stat st;
-    stat(file[language-1], &st);
+    stat(filename, &st);
 
     struct Head head;
     head.language = language;
@@ -134,7 +143,7 @@ int main()
 {
     int sockfd = StartLink();
     assert(sockfd != -1);
-    
+
     int language = ChoiceLanguage();
     int flag = 2;
 
@@ -149,7 +158,7 @@ int main()
         WriteCode(flag, language);
 
         //2.
-        SendData(scokfd, language);
+        SendData(sockfd, language);
 
         //3.
         RecvData(sockfd);

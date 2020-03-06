@@ -15,36 +15,11 @@
 
 #define MAXEVENTS 100
 
-int RecvCode(int connectfd)
-{
-    struct Head head;
-    recv(connectfd, &head,sizeof(head), 0);
-    int filefd = open(file[head.language-1], O_WRONLY | O_TRUNC | O_CREAT, 0664);
-
-    int size = 0;
-    while(1)
-    {
-        int num = head.file_size-size > 127 ? 127 : head.file_size-size;
-        char buff[128] = {0};
-        int n = recv(fd, buff, num, 0);
-        if(0 == n)
-            break;
-
-        size+=n;
-        write(filefd, buff, n);
-        if(size > head.file_size)
-            break;
-    }
-    close(filefd);
-
-    return head.language;
-}
-
-void GetNewClient(int listenfd, int epfd)
+void GetNewConnect(int listenfd, int epfd)
 {
     struct sockaddr_in cli;
-    socklen_t = sizeof(cli);
-    int connectfd = accept(listenfd, (struct sockaddr*)&cli, &cli);
+    socklen_t len = sizeof(cli);
+    int connectfd = accept(listenfd, (struct sockaddr*)&cli, &len);
     if(connectfd < 0)
     {
         perror("connectfd error");
@@ -122,12 +97,12 @@ void Execute(int language)
         dup(fd);
         if(language == 3)
         {
-            execl(carr[language-1] ,carr[language-1], "main.class", (char*)0);
+            execl(carry[language-1] ,carry[language-1], "main.class", (char*)0);
 
         }
         else
         {
-            execl(carr[language-1] ,carr[language-1], (char*)0);
+            execl(carry[language-1] ,carry[language-1], (char*)0);
         }
 
         write(fd, "execute error", 13);
@@ -195,7 +170,7 @@ void DelFinshEvents(int listenfd, int epfd, struct epoll_event* events, int len)
     int i = 0;
     for(; i<len; ++i)
     {
-        int scokfd = events[i].data.fd;
+        int sockfd = events[i].data.fd;
         
         //判断是否有新连接
         if(sockfd == listenfd)
@@ -226,17 +201,17 @@ int CreateSocket()
     if(-1 == listenfd)
         return -1;
 
-    struct scokaddr_in ser;
+    struct sockaddr_in ser;
     memset(&ser, 0, sizeof(ser));
-    ser.sin_fimily = AF_INET;
+    ser.sin_family = AF_INET;
     ser.sin_port = htons(6000);
-    ser.sin_addr.s_addr = inet("127.0.0.1");
+    ser.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    int res = bind(sockfd, (struct sockaddr*)&ser, sizeof(ser));
+    int res = bind(listenfd, (struct sockaddr*)&ser, sizeof(ser));
     if(-1 == res)
         return -1;
 
-    res = listen(sockfd, 5);
+    res = listen(listenfd, 5);
     if(-1 == res)
         return -1;
 
@@ -251,8 +226,8 @@ int main()
     int epfd = epoll_create(5);
     assert(-1 != epfd);
 
-    struct epoll_evevt event;
-    event.data.fd = sockfd;
+    struct epoll_event event;
+    event.data.fd = listenfd;
     event.events |= EPOLLIN;
 
     epoll_ctl(epfd, EPOLL_CTL_ADD, listenfd, &event);
@@ -267,8 +242,8 @@ int main()
             continue;
         }
 
-        DelFinshEvents(sockfd, epfd, events, n);
+        DelFinshEvents(listenfd, epfd, events, n);
     }
-    
+
     exit(0);
 }

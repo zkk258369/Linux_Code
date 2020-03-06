@@ -1,7 +1,15 @@
-ser : online_server.o
-	gcc -c online_server.c head.h -o ser 
-cli : online_client.o
-	gcc -c online_client.c head.h -o cli
+SOURCE = $(wildcard *.c)
+TARGETS = $(patsubst %.c, %, $(SOURCE))
 
-clean : 
-	rm *.o
+ CC = gcc
+ CFLAGS = -Wall -g
+
+all:$(TARGETS)
+
+$(TARGETS):%:%.c head.h
+	$(CC) $< $(CFLAGS) -o $@
+
+
+.PHONY:clean all
+clean:
+	-rm -rf $(TARGETS)

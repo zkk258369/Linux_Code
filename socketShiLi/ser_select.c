@@ -105,7 +105,8 @@ int main()
                 int i = 0;
                 for(; i<MAXFD; ++i)
                 {
-                    if(fds[i] == -1)
+             
+					if(fds[i] == -1)
                     {
                         continue;
                     }
@@ -131,13 +132,15 @@ int main()
                                     printf("client %d is over!\n",fds[i]);
                                     close(fds[i]);
                                     fds_del(fds,fds[i]);
-                                }
+                        
+								}
                                 else
                                 {
                                     printf("recv(%d)=%s\n",fds[i],buff);
                                     send(fds[i], "ok", 2, 0);
                                 }
-                        }
+                   
+						}
                     }
                 }
             }
