@@ -70,15 +70,15 @@ void InsertSort(vector<int>& vec)
 
 //ShellSort()  缩小增量排序   O(n^1.3~n^1.5),O(1),不稳定
 //start-------------------------------------------------------
-void ShellSort(vector<int>& vec)
+template<typename T>
+void ShellSort(T* arr, int len)
 {
-    int len = vec.size();
     for(int gap=len>>1; gap > 0; gap>>=1)
     {
         for(int i=gap; i < len; i++)
         {
-            for(int j=i-gap; j >= 0 && vec[j] > vec[j+gap]; j-=gap)
-                swap(vec[j], vec[j+gap]);
+            for(int j=i-gap; j >= 0 && arr[j] > arr[j+gap]; j-=gap)
+                swap(arr[j], arr[j+gap]);
         }
     }
 }
@@ -91,15 +91,15 @@ void ShellSort(vector<int>& vec)
 
 //BubbleSort()   O(n^2),O(1),稳定
 //start--------------------------------------------------------
-void BubbleSort(vector<int>& vec)
+template<typename T>
+void BubbleSort(T* arr, int len)
 {
-    int len = vec.size();
     for(int i=0; i<len-1; ++i)
     {
         for(int j=0; j+1<len-i; ++j)
         {
-            if(vec[j] > vec[j+1])
-                swap(vec[j], vec[j+1]);
+            if(arr[j] > arr[j+1])
+                swap(arr[j], arr[j+1]);
         }
     }
 }
@@ -140,9 +140,50 @@ void QuickSort(T arr[], int len)
 //递归
 
 //非递归
+typedef struct Range
+{
+    int start;
+    int end;
+    Range(const int& s = 0, const int& e = 0)
+    {
+        start = s;
+        end = e;
+    }
+}Range;
+
+template<typename T>
+void QuickSort2(T* arr, int len)
+{
+    if(len <= 1)
+        return;
+    Range r[len];
+    int p = 0;
+    r[p++] = Range(0, len-1);//r[p++] 相当于入栈  r[--p] 相当于出栈
+    while(p)
+    {
+        Range range = r[--p];
+        if(range.start >= range.end)
+            continue;
+        int left = range.start;
+        int right = range.end;
+        int X = arr[left];//基准
+        while(left < right)
+        {
+            while(arr[right] >= X && left < right)
+                right--;
+            arr[left] = arr[right];
+            while(arr[left] < X && left < right)
+                left++;
+            arr[right] = arr[left];
+        }
+        arr[left] = X;
+        r[p++] = Range(range.start, left-1);
+        r[p++] = Range(left+1, range.end);
+    }
+}
 //非递归
 //end---------------------------------------------------------
-//QuickSort() 
+//QuickSort()
 
 template<typename T>
 void Show(T arr[], int len)
@@ -159,24 +200,25 @@ int main()
     clock_t start;
     clock_t end;
 
-    vector<int> vec;
-	srand(time(nullptr));
-	for (int i = 0; i < 30000; i++)
+    #define size 20000
+    int arr[size];
+    int send = 0;
+    srand((int)time(nullptr) + send++);
+    for (int i = 0; i < size; i++)
     {
-        vec.push_back(rand() % 30000);
+        arr[i] = rand()%size;
     }
 
-    int arr[] = {6,9,1,2,5,8,4,12,34,56,7,32,45,6,0,122};
     int len = sizeof(arr)/sizeof(arr[0]);
     vector<int> vec1(arr,arr+len);
 
 
-    Show(arr, len);
+    //Show(arr, len);
     start = clock();
-    //BubbleSort(vec);
-    //InsertSort2(vec);
-    //ShellSort(vec);
-    QuickSort(arr, len);
+    //BubbleSort(arr, len);
+    //InsertSort2(arr, len);
+    //ShellSort(arr, len);
+    QuickSort2(arr, len);
 
 
     end = clock();
