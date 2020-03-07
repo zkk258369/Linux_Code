@@ -7,7 +7,7 @@
 using namespace std;
 using std::vector;
 
-//插入排序  直接插入排序  希尔排序
+//1.插入排序  直接插入排序  希尔排序
 
 //InsertSort()   O(n^2),O(1),稳定;最好情况为O(n)
 //start-------------------------------------------------------
@@ -86,7 +86,8 @@ void ShellSort(vector<int>& vec)
 //end---------------------------------------------------------
 //ShellSort()
 
-//交换排序 冒泡 快排
+
+//2.交换排序 冒泡 快排
 
 //BubbleSort()   O(n^2),O(1),稳定
 //start--------------------------------------------------------
@@ -106,21 +107,49 @@ void BubbleSort(vector<int>& vec)
 //end---------------------------------------------------------
 //BubbleSort()
 
-//QuickSort() 
+//QuickSort()
 //start-------------------------------------------------------
-void QuickSort(vector<int>& vec)
+//递归
+template<typename T>
+void QuickSort_recursive(T arr[], int l, int r)
 {
-    int len = vec.size();
+    if(l >= r)
+        return;
+    T X = arr[l];//基准
+    int left = l;
+    int right = r;
+    while(left < right)
+    {
+        while(arr[right] >= X && left < right)
+            right--;
+        arr[left] = arr[right];
+        while(arr[left] < X && left < right)
+            left++;
+        arr[right] = arr[left];
+    }
+    arr[left] = X;
+    QuickSort_recursive(arr, l, left-1);
+    QuickSort_recursive(arr, left+1, r);
 }
 
+template<typename T>
+void QuickSort(T arr[], int len)
+{
+    QuickSort_recursive(arr, 0, len-1);
+}
+//递归
+
+//非递归
+//非递归
 //end---------------------------------------------------------
 //QuickSort() 
 
-void Show(const vector<int>& vec)
+template<typename T>
+void Show(T arr[], int len)
 {
-    for(auto item : vec)
+    for(int i=0; i<len; ++i)
     {
-        cout << item << " ";
+        cout << arr[i] << " ";
     }
     cout<<endl;
 }
@@ -142,18 +171,18 @@ int main()
     vector<int> vec1(arr,arr+len);
 
 
-    //Show(vec);
+    Show(arr, len);
     start = clock();
     //BubbleSort(vec);
     //InsertSort2(vec);
-    ShellSort(vec);
+    //ShellSort(vec);
+    QuickSort(arr, len);
 
 
     end = clock();
-    Show(vec);
+    Show(arr, len);
     cout << "The run time is:" <<(double)(end - start) / CLOCKS_PER_SEC << "s" << endl;
     cout << "The all run time is:" << (double)clock() / CLOCKS_PER_SEC<< "s" << endl;
 
-    system("pause");
     return 0;
 }
