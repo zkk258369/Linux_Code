@@ -185,6 +185,71 @@ void QuickSort2(T* arr, int len)
 //end---------------------------------------------------------
 //QuickSort()
 
+//3.选择排序  选择排序  堆排序
+
+//start
+//SelectSort()
+template<typename T>
+void SelectSort(T* arr, int len)
+{
+    int minIndex=0;
+    for(int i=0; i<len-1; ++i)
+    {
+        for(int j=i+1; j<len; ++j)
+        {
+            minIndex = i;
+            if(arr[j]<arr[i])
+            {
+                minIndex = j;
+            }
+        }
+        std::swap(arr[i], arr[minIndex]);
+    }
+}
+//end
+//SeletcSort()
+
+//start
+//HeapSort()
+template<typename T>
+void Max_heapify(T* arr, int start, int end)
+{
+    int dad = start;
+    int son = dad*2 + 1;
+    while(son <= end)
+    {
+        if(son+1 <= end && arr[son] < arr[son+1])
+            son++;
+        if(arr[dad] > arr[son])
+            break;
+        else
+        {
+            swap(arr[son], arr[dad]);
+            dad = son;
+            son = dad*2 + 1;
+        }
+    }
+}
+
+template<typename T>
+void HeapSort(T* arr, int len)
+{
+    if(len<=1 || arr==nullptr)
+        return;
+    for(int i=len/2 - 1; i>=0; --i)
+    {
+        Max_heapify(arr, i, len-1);
+    }
+    for(int i=len-1; i>0; --i)
+    {
+        swap(arr[0], arr[i]);
+        Max_heapify(arr, 0, i-1);
+    }
+}
+
+//HeapSort()
+//end
+
 template<typename T>
 void Show(T arr[], int len)
 {
@@ -218,7 +283,9 @@ int main()
     //BubbleSort(arr, len);
     //InsertSort2(arr, len);
     //ShellSort(arr, len);
-    QuickSort2(arr, len);
+    //QuickSort2(arr, len);
+    //SelectSort(arr, len);
+    HeapSort(arr, len);
 
 
     end = clock();
