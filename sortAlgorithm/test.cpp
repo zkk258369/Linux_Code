@@ -90,7 +90,7 @@ void ShellSort(T* arr, int len)
 //2.交换排序 冒泡 快排
 
 //BubbleSort()   O(n^2),O(1),稳定
-//start--------------------------------------------------------
+//start-------------------------------------------------------
 template<typename T>
 void BubbleSort(T* arr, int len)
 {
@@ -187,7 +187,7 @@ void QuickSort2(T* arr, int len)
 
 //3.选择排序  选择排序  堆排序
 
-//start
+//start-------------------------------------------------------
 //SelectSort()
 template<typename T>
 void SelectSort(T* arr, int len)
@@ -206,10 +206,10 @@ void SelectSort(T* arr, int len)
         std::swap(arr[i], arr[minIndex]);
     }
 }
-//end
+//end---------------------------------------------------------
 //SeletcSort()
 
-//start
+//start-------------------------------------------------------
 //HeapSort()
 template<typename T>
 void Max_heapify(T* arr, int start, int end)
@@ -248,7 +248,69 @@ void HeapSort(T* arr, int len)
 }
 
 //HeapSort()
-//end
+//end---------------------------------------------------------
+
+//4.归并排序
+//MergeSort()
+//start-------------------------------------------------------
+
+//recursive
+void mergeArray1(int* arr, int start, int mid, int end, int* temp)
+{
+    int i = start;
+    int j = mid+1;
+    int m = mid;
+    int n = end;
+    int k = 0;
+
+    while(i<=m && j<=n)
+    {
+        if(arr[i] <= arr[j])
+            temp[k++] = arr[i++];
+        else
+            temp[k++] = arr[j++];
+    }
+    while(i <= m)
+        temp[k++] = arr[i++];
+    while(j <= n)
+        temp[k++] = arr[j++];
+    for(i=0; i<k; i++)
+        arr[start+i] = temp[i];        
+}
+
+void _MergeSort1(int* arr, int start, int end, int* temp)
+{
+    if(start < end)
+    {
+        int mid = (start+end)/2;
+        _MergeSort1(arr, start, mid, temp);
+        _MergeSort1(arr, mid+1, end, temp);
+        mergeArray1(arr, start, mid, end, temp);
+    }
+}
+template<typename T>
+void MergeSort(T* arr, int len)//直接创建一个大数组
+{
+    if(arr == nullptr || len <= 1)
+        return;
+    T* p = new T[len];
+    if(p == nullptr)
+    {
+        cout << "new error" << endl;
+        return;
+    }
+    _MergeSort1(arr, 0, len-1, p);
+}
+//recursive
+
+//non recursive
+//non recursive
+
+//MergeSort()
+//end---------------------------------------------------------
+
+
+
 
 template<typename T>
 void Show(T arr[], int len)
@@ -265,7 +327,7 @@ int main()
     clock_t start;
     clock_t end;
 
-    #define size 20000
+    #define size 100000
     int arr[size];
     int send = 0;
     srand((int)time(nullptr) + send++);
@@ -275,7 +337,7 @@ int main()
     }
 
     int len = sizeof(arr)/sizeof(arr[0]);
-    vector<int> vec1(arr,arr+len);
+    vector<int> vec(arr,arr+len);
 
 
     //Show(arr, len);
@@ -283,13 +345,14 @@ int main()
     //BubbleSort(arr, len);
     //InsertSort2(arr, len);
     //ShellSort(arr, len);
-    //QuickSort2(arr, len);
+    //QuickSort(arr, len);
     //SelectSort(arr, len);
-    HeapSort(arr, len);
+    //HeapSort(arr, len);
+    MergeSort(arr, len);
 
 
     end = clock();
-    Show(arr, len);
+    //Show(arr, len);
     cout << "The run time is:" <<(double)(end - start) / CLOCKS_PER_SEC << "s" << endl;
     cout << "The all run time is:" << (double)clock() / CLOCKS_PER_SEC<< "s" << endl;
 
