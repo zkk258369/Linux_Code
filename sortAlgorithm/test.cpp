@@ -304,6 +304,47 @@ void MergeSort(T* arr, int len)//直接创建一个大数组
 //recursive
 
 //non recursive
+void non_recursive_mergeSort(int* arr, int len)
+{
+    int* pa = arr;
+    int* pb = new int[len];
+    for(int seg=1; seg<len; seg+=seg)
+    {
+        for(int start=0; start<len; start+=seg+seg)
+        {
+            int low = start;
+            int mid = min(start+seg, len);
+            int high = min(start+seg+seg, len);
+            int k = low;
+            int start1 = low, end1 = mid;
+            int start2 = mid, end2 = high;
+            while(start1 < end1 && start2 < end2)
+                pb[k++] = pa[start1] < pa[start2] ? pa[start1++] : pa[start2++];
+            while(start1 < end1)
+                pb[k++] = pa[start1++];
+            while(start2 < end2)
+                pb[k++] = pa[start2++];
+        }
+        int* temp = pa;
+        pa = pb;
+        pb = temp;
+    }
+    if(pa != arr)
+    {
+        for(int i=0; i<len; i++)
+            pb[i] = pa[i];
+        pb=pa;
+    }
+    delete[] pb;
+}
+
+/*
+ * 我的理解
+ * 对一个数组先进行两个两个的排序，比如先排序下标为0,1的两个数进行排序，
+ * 然后对下标为2,3进行排序，排序到数组结束后，将数组pb变成源数组，
+ * 然后将seg扩大成2，每次要排序的数组就变成了0,1,2,3; 4,5,6,7;这样的四个一组
+ * 随着seg的增大，直到数组序列书为1.
+*/
 //non recursive
 
 //MergeSort()
@@ -327,7 +368,7 @@ int main()
     clock_t start;
     clock_t end;
 
-    #define size 100000
+    #define size 10000
     int arr[size];
     int send = 0;
     srand((int)time(nullptr) + send++);
@@ -338,8 +379,8 @@ int main()
 
     int len = sizeof(arr)/sizeof(arr[0]);
     vector<int> vec(arr,arr+len);
-
-
+    int arr1[] = {1,8,6,7,9,5,1,7,5,93,1,54,6,8,15,45,2,76,82,35};
+    int len1 = sizeof(arr1)/sizeof(arr1[0]);
     //Show(arr, len);
     start = clock();
     //BubbleSort(arr, len);
@@ -348,13 +389,15 @@ int main()
     //QuickSort(arr, len);
     //SelectSort(arr, len);
     //HeapSort(arr, len);
-    MergeSort(arr, len);
+    //MergeSort(arr, len);
+    non_recursive_mergeSort(arr1, len1);
+
 
 
     end = clock();
-    //Show(arr, len);
+    Show(arr1, len1);
     cout << "The run time is:" <<(double)(end - start) / CLOCKS_PER_SEC << "s" << endl;
     cout << "The all run time is:" << (double)clock() / CLOCKS_PER_SEC<< "s" << endl;
-
+    system("pause");
     return 0;
 }
