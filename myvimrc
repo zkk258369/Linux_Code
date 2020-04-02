@@ -85,8 +85,7 @@ map sh :set nosplitright<CR>:vsplit<CR>
 map sj :set nosplitbelow<CR>:split<CR>
 map sk :set splitbelow<CR>:split<CR>
 
-noremap h k
-noremap j h
+noremap j k
 noremap k j
 
 map wj :res +5<CR>
