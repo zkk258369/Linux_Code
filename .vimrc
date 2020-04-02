@@ -434,8 +434,10 @@ map sh :set nosplitright<CR>:vsplit<CR>
 map sj :set nosplitbelow<CR>:split<CR>
 map sk :set splitbelow<CR>:split<CR>
 
-noremap j k
+noremap h k
+noremap j h
 noremap k j
+
 
 map w<up> :res +5<CR>
 map w<down> :res -5<CR>
