@@ -154,16 +154,14 @@ typedef struct Range
 template<typename T>
 void QuickSort2(T* arr, int len)
 {
-    if(len <= 1)
-        return;
+    if(len <= 1) return;
     Range r[len];
     int p = 0;
     r[p++] = Range(0, len-1);//r[p++] 相当于入栈  r[--p] 相当于出栈
     while(p)
     {
         Range range = r[--p];
-        if(range.start >= range.end)
-            continue;
+        if(range.start >= range.end) continue;
         int left = range.start;
         int right = range.end;
         int X = arr[left];//基准
