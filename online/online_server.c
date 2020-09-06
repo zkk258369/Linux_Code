@@ -152,7 +152,7 @@ void DealClientData(int connectfd)
     //2.complie code
     int flag = 0;
     flag = ComplieCode(language);
-    
+
     //3.execution
     if(0 == flag)
     {
@@ -171,7 +171,7 @@ void DelFinshEvents(int listenfd, int epfd, struct epoll_event* events, int len)
     for(; i<len; ++i)
     {
         int sockfd = events[i].data.fd;
-        
+
         //判断是否有新连接
         if(sockfd == listenfd)
         {
