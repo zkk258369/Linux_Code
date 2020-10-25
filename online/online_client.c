@@ -1,21 +1,9 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<assert.h>
-#include<string.h>
-#include<unistd.h>
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<arpa/inet.h>
-#include<netinet/in.h>
-#include<sys/epoll.h>
-#include<fcntl.h>
 #include"head.h"
-
+ 
 int StartLink(void)
 {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if(-1 == sockfd)
-        return -1;
+    if(-1 == sockfd) return -1;
 
     struct sockaddr_in cli;
     memset(&cli, 0, sizeof(cli));
@@ -24,8 +12,7 @@ int StartLink(void)
     cli.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     int res = connect(sockfd, (struct sockaddr*)&cli, sizeof(cli));
-    if(-1 == res)
-        return -1;
+    if(-1 == res) return -1;
 
     return sockfd;
 }
@@ -50,8 +37,7 @@ int ChoiceLanguage(void)
 
 void WriteCode(int flag, int language)
 {
-    if(2 == flag)
-        unlink(file[language-1]);
+    if(2 == flag) unlink(file[language-1]);
 
     pid_t pid = fork();
     assert(pid != -1);
@@ -93,8 +79,7 @@ void SendData(int sockfd, int language)
     {
         char buff[128] = {0};
         int n = read(fd, buff, 127);
-        if(n <= 0)
-            break;
+        if(n <= 0) break;
 
         send(sockfd, buff, n, 0);
     }
@@ -120,8 +105,7 @@ void RecvData(int sockfd)
         }
         printf("%s", buff);
         num+=n;
-        if(num >= size)
-            break;
+        if(num >= size) break;
     }
 }
 
@@ -152,7 +136,7 @@ int main()
         //1.用户输入代码
         //2.将选择的语言和代码发送给服务器
         //3.获取服务器端发送的反馈
-        //4.给用户提示  1.修改代码  2.编写下一个  3.退出
+        //4.给用户提示flag  1.修改代码  2.编写下一个  3.退出
 
         //1.
         WriteCode(flag, language);
@@ -166,7 +150,10 @@ int main()
         //4.
         flag = PrintTag();
         if(3 == flag)
+        {
+            printf("\tBye!\tBye\n");
             break;
+        }
     }
 
     close(sockfd);

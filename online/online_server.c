@@ -1,19 +1,6 @@
 #define _GUN_SOURCE
-#include<stdio.h>
-#include<stdlib.h>
-#include<assert.h>
-#include<string.h>
-#include<unistd.h>
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<arpa/inet.h>
-#include<netinet/in.h>
-#include<sys/epoll.h>
-#include<fcntl.h>
 #include<sys/stat.h>
 #include"head.h"
-
-#define MAXEVENTS 100
 
 void GetNewConnect(int listenfd, int epfd)
 {
@@ -29,8 +16,10 @@ void GetNewConnect(int listenfd, int epfd)
     event.data.fd = connectfd;
     event.events = EPOLLIN | EPOLLRDHUP;
     int res = epoll_ctl(epfd, EPOLL_CTL_ADD, connectfd, &event);
-    if(res == -1)
+    if(-1 == res)
+    {
         perror("epoll_ctl_add error in GetNewClient()");
+    }
 }
 
 int RecvCode(int connectfd)
@@ -46,13 +35,11 @@ int RecvCode(int connectfd)
         int num = head.file_size-size > 127 ? 127 : head.file_size-size;
         char buff[128] = {0};
         int n = recv(connectfd, buff, num, 0);
-        if(0 == n)
-            break;
+        if(0 == n) break;
 
         size+=n;
         write(filefd, buff, n);
-        if(size >= head.file_size)
-            break;
+        if(size >= head.file_size) break;
     }
     close(filefd);
     return head.language;
@@ -98,7 +85,6 @@ void Execute(int language)
         if(language == 3)
         {
             execl(carry[language-1] ,carry[language-1], "main.class", (char*)0);
-
         }
         else
         {
@@ -198,8 +184,7 @@ void DelFinshEvents(int listenfd, int epfd, struct epoll_event* events, int len)
 int CreateSocket()
 {
     int listenfd = socket(AF_INET, SOCK_STREAM, 0);
-    if(-1 == listenfd)
-        return -1;
+    if(-1 == listenfd) return -1;
 
     struct sockaddr_in ser;
     memset(&ser, 0, sizeof(ser));
@@ -208,12 +193,10 @@ int CreateSocket()
     ser.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     int res = bind(listenfd, (struct sockaddr*)&ser, sizeof(ser));
-    if(-1 == res)
-        return -1;
+    if(-1 == res) return -1;
 
     res = listen(listenfd, 5);
-    if(-1 == res)
-        return -1;
+    if(-1 == res) return -1;
 
     return listenfd;
 }
@@ -235,14 +218,13 @@ int main()
     while(1)
     {
         struct epoll_event events[MAXEVENTS];
-        int n = epoll_wait(epfd, events, MAXEVENTS, -1);
-        if(0 >= n)
+        int len = epoll_wait(epfd, events, MAXEVENTS, -1);
+        if(0 >= len)
         {
-            printf("epoll_wait error]n");
+            printf("epoll_wait error\n");
             continue;
         }
-
-        DelFinshEvents(listenfd, epfd, events, n);
+        DelFinshEvents(listenfd, epfd, events, len);
     }
 
     exit(0);
